@@ -32,7 +32,7 @@ Login credentials:
 - **User**: minioadmin
 - **Password**: minioadmin
 
-#### File Storage
+#### MinIO File Storage
 
 File storage is handled using a bind volume for the docker container:\
 `./data/minio/:/mnt/data/`
@@ -58,7 +58,7 @@ The PostgreSQL setup is determined by its config file at `setup/postgres/config.
 | Password          | postgres_password | = POSTGERS_PASSWORD in `config.env` |
 | Database          | redditor_db       | = POSTGERS_DB in `config.env`       |
 
-#### File Storage
+#### PostgreSQL File Storage
 
 File storage is handled using a bind volume for the docker container:\
 `./data/postgres/:/var/lib/postgresql/data/`
