@@ -10,6 +10,8 @@ This section contains information on how each system is setup and how these syst
 
 ### MinIO
 
+The MinIO setup is determined by its config file under `setup/minio/config.env`.
+
 #### Web Services
 
 | Container Address | Container Port | Host Address   | Port | Description |
@@ -17,7 +19,7 @@ This section contains information on how each system is setup and how these syst
 | 172.18.0.2        | 9000           | localhost      | 9000 | API         |
 | 172.18.0.2        | 9001           | localhost      | 9001 | WebUI       |
 
-Login credentials (as specified by environment variables):
+Login credentials:
 
 - **User**: minioadmin
 - **Password**: minioadmin
