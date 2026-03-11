@@ -22,10 +22,11 @@ The MinIO setup is determined by its config file under `setup/minio/config.env`.
 
 #### MinIO Web Services
 
-| Container Address | Container Port | Host Address   | Port | Description |
-|-------------------|----------------|----------------|------|-------------|
-| 172.18.0.2        | 9000           | localhost      | 9000 | API         |
-| 172.18.0.2        | 9001           | localhost      | 9001 | WebUI       |
+| Container Address | Container Port | Host Address   | Host Port | Description   |
+|-------------------|----------------|----------------|-----------|---------------|
+| 172.18.0.4        | 9000           | localhost      | 9000      | API           |
+| 172.18.0.4        | 9001           | localhost      | 9001      | WebUI         |
+| 172.18.0.5        | 8080           | localhost      | 8080      | Adminer WebUI |
 
 Login credentials:
 
