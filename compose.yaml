@@ -1,3 +1,11 @@
+# Docker compose file
+
+x-airflow-common: &airflow-common
+    image: apache/airflow:3.1.8
+    env_file:
+        - "./setup/airflow/config_general.env"
+    user: "50000:0"
+
 services:
     minio:
         image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
@@ -56,3 +64,17 @@ services:
             /opt/spark/bin/spark-class
             org.apache.spark.deploy.worker.Worker
             spark://spark-master:7077
+
+    airflow-init:
+        <<: *airflow-common
+        container_name: airflow-init
+        volumes:
+            - ./data/airflow/dags:/opt/airflow/dags
+            - ./data/airflow/logs:/opt/airflow/logs
+            - ./data/airflow/config:/opt/airflow/config
+            - ./data/airflow/plugins:/opt/airflow/plugins
+            - ./setup/airflow/init.sh:/opt/airflow/init.sh # Init script
+        entrypoint: /bin/bash
+        command:
+            - /opt/airflow/init.sh
+        user: "0:0"
