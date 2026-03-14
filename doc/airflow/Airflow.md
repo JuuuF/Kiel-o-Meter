@@ -87,3 +87,57 @@ Possible task states are:
 | FAILED           | Task has failed to execute                                               |
 | UP_FOR_RETRY     | Task failed, but execution can be repeated                               |
 | SKIPPED          | Task execution has been skipped                                          |
+
+## Working Diagram
+
+```plaintext
+    ┌─────────────┐
+    │  Scheduler  │         -> decides what to do
+    └──────┬──────┘
+           │
+           │ uses
+           ▼
+    ┌─────────────┐
+    │   Executor  │         -> decides how to run it
+    │ (Celery)    │
+    └──────┬──────┘
+           │
+           │ sends tasks
+           ▼
+    ┌─────────────┐
+    │ Message     │         -> queues jobs
+    │ Broker      │
+    │ (Redis)     │
+    └──────┬──────┘
+           │
+           ▼
+    ┌─────────────┐
+    │ Workers     │         -> do the work
+    │ run tasks   │
+    └──────┬──────┘
+           │ 
+           │ update DB entries (success / failed)
+           ▼
+    ┌─────────────┐
+    |  Scheduler  |
+    └─────────────┘
+```
+
+## Minimal Airflow Setup
+
+A minimal Airflow setup consists of:
+
+- Scheduler
+  - triggering scheduled tasks
+  - submitting tasks to executor
+- (Executor)
+  - runs on the scheduler instance
+- DAG processor
+  - parse the DAG files
+  - serialize them into metadata database
+- Webserver
+  - UI for inspection, triggering and debugging
+- Folder for DAG files
+- Metadata DB
+  - usually PostgreSQL / MySQL
+  - storing task states, DAGs and variables
