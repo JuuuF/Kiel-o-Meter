@@ -78,12 +78,12 @@ Once tasks are marked with *success*, the scheduler re-evalutates the dependenci
 
 Possible task states are:
 
-| State        | Description                                                              |
-|--------------|--------------------------------------------------------------------------|
-| NONE         | Task is not yet ready to be executed, i.e. dependencies are not yet done |
-| SCHEDULED    | Task is ready to be executed                                             |
-| RUNNING      | Task is currently in execution                                           |
-| SUCCESS      | Task has been successfully executed                                      |
-| FAILED       | Task has failed to execute                                               |
-| UP_FOR_RETRY | Task failed, but execution can be repeated                               |
-| SKIPPED      | Task execution has been skipped                                          |
+| State            | Description                                                              |
+|------------------|--------------------------------------------------------------------------|
+| NONE             | Task is not yet ready to be executed, i.e. dependencies are not yet done |
+| SCHEDULED        | Task is ready to be executed                                             |
+| RUNNING / QUEUED | Task is currently in execution                                           |
+| SUCCESS          | Task has been successfully executed                                      |
+| FAILED           | Task has failed to execute                                               |
+| UP_FOR_RETRY     | Task failed, but execution can be repeated                               |
+| SKIPPED          | Task execution has been skipped                                          |
