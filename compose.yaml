@@ -180,6 +180,21 @@ services:
     # --------------------------------------------------------------------
     # Superset services
 
+    superset-init:
+        image: apache/superset:GHA-23081398393
+        container_name: superset-init
+        env_file:
+            - ./setup/superset/config.env
+        volumes:
+            - ./setup/superset/superset_config.py:/app/superset/superset_config.py
+            - ./setup/superset/init.sh:/app/superset/init.sh
+        depends_on:
+            postgres:
+                condition: service_healthy
+        entrypoint: /bin/bash
+        command:
+            - /app/superset/init.sh
+
     superset:
         image: apache/superset:GHA-23081398393
         container_name: superset
