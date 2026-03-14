@@ -202,3 +202,8 @@ services:
             - ./setup/superset/config.env
         volumes:
             - ./setup/superset/superset_config.py:/app/superset/superset_config.py
+        depends_on:
+            superset-init:
+                condition: service_completed_successfully
+            postgres:
+                condition: service_healthy
