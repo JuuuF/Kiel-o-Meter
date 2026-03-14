@@ -10,6 +10,9 @@ x-airflow-common: &airflow-common
             condition: service_healthy
 
 services:
+    # --------------------------------------------------------------------
+    # Data Lake
+
     minio:
         image: minio/minio:RELEASE.2025-09-07T16-13-09Z-cpuv1
         container_name: minio
@@ -33,10 +36,18 @@ services:
         env_file:
             - "./setup/postgres/config.env"
         healthcheck:
-          test: ["CMD", "pg_isready", "--username", "postgres_user", "--dbname", "redditor_db"]
-          interval: 10s
-          retries: 5
-          start_period: 5s
+            test:
+                [
+                    "CMD",
+                    "pg_isready",
+                    "--username",
+                    "postgres_user",
+                    "--dbname",
+                    "redditor_db",
+                ]
+            interval: 10s
+            retries: 5
+            start_period: 5s
 
     # DB monitoring
     adminer:
