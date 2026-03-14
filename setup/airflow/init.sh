@@ -37,40 +37,28 @@
 #     echo
 # fi
 
+init_step() {
+	echo
+	echo "[Init Step] $1"
+	echo
+}
 
-echo
-echo "Creating missing opt dirs if missing:"
-echo
+init_step "Creating missing opt dirs if missing."
 mkdir -v -p /opt/airflow/{logs,dags,plugins,config}
-echo
-echo "Airflow version:"
-/entrypoint airflow version
-echo
-# echo "Files in shared volumes:"
-# echo
-# ls -la /opt/airflow/{logs,dags,plugins,config}
-# echo
-echo "Running airflow config list to create default config file if missing."
-echo
-/entrypoint airflow config list >/dev/null
-echo
-# echo "Files in shared volumes:"
-# echo
-# ls -la /opt/airflow/{logs,dags,plugins,config}
-# echo
-echo "Change ownership of files in /opt/airflow to ${AIRFLOW_UID}:0"
-echo
-chown -R "${AIRFLOW_UID}:0" /opt/airflow/
-echo
-echo "Change ownership of files in shared volumes to ${AIRFLOW_UID}:0"
-echo
-chown -v -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config}
-# echo
-# echo "Files in shared volumes:"
-# echo
-# ls -la /opt/airflow/{logs,dags,plugins,config}
 
-echo "Migrating Database..."
+init_step "Airflow version:"
+/entrypoint airflow version
+
+init_step "Running airflow config list to create default config file if missing."
+/entrypoint airflow config list >/dev/null
+
+init_step "Change ownership of files in /opt/airflow to ${AIRFLOW_UID}:0"
+chown -R "${AIRFLOW_UID}:0" /opt/airflow/
+
+init_step "Change ownership of files in shared volumes to ${AIRFLOW_UID}:0"
+chown -v -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config}
+
+init_step "Migrating Database..."
 /entrypoint airflow db migrate
 
 echo "Finished Airflow Initialization."
