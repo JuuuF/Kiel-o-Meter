@@ -61,7 +61,7 @@ chown -v -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config}
 init_step "Migrating Database..."
 /entrypoint airflow db migrate
 
-init_step "Creating default user"
+init_step "Creating default DB user"
 /entrypoint airflow users create \
 	--username "$AIRFLOW_API_USER_USERNAME" \
 	--password "$AIRFLOW_API_USER_PASSWORD" \
@@ -71,7 +71,6 @@ init_step "Creating default user"
 	--email "$AIRFLOW_API_USER_EMAIL" \
 	--verbose
 
-
-echo
+echo "--------------------------------------------------------------------"
 echo "Finished Airflow Initialization."
 echo "--------------------------------------------------------------------"
