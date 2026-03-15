@@ -224,7 +224,7 @@ services:
         command: scheduler
 
     # Celery Broker
-    redis:
+    airflow-broker-redis:
         image: redis:7.2-bookworm
         container_name: airflow-broker-redis
         expose:
