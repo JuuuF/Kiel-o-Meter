@@ -29,10 +29,10 @@ Set up services using Docker:
 
 Infrastructure is ready when:
 
-- [ ] `docker compose up` starts all services
+- [X] `docker compose up` starts all services
 - [X] MinIO dashboard is accessible
 - [X] PostgreSQL accepts connections
 - [X] Spark container starts successfully
 - [X] Airflow UI loads
 - [X] Superset UI loads
-- [ ] All services can communicate via Docker network
+- [X] All services can communicate via Docker network
