@@ -234,7 +234,7 @@ services:
             - ./setup/superset/superset_config.py:/app/superset/superset_config.py
             - ./setup/superset/init.sh:/app/superset/init.sh
         depends_on:
-            postgres:
+            db-superset:
                 condition: service_healthy
         entrypoint: /bin/bash
         command:
@@ -252,5 +252,5 @@ services:
         depends_on:
             superset-init:
                 condition: service_completed_successfully
-            postgres:
+            db-superset:
                 condition: service_healthy
