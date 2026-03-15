@@ -61,10 +61,10 @@ services:
         image: postgres:15
         container_name: db-redditor
         env_file:
-            - ./setup/postgres/config_redditor_db.env
+            - ./setup/redditor_db/config_redditor_db.env
         volumes:
-            - ./data/postgres/redditor_db:/var/lib/postgresql/data
-            - ./setup/postgres/init_redditor.sql:/docker-entrypoint-initdb.d/init.sql
+            - ./data/redditor_db:/var/lib/postgresql/data
+            - ./setup/redditor_db/init_redditor.sql:/docker-entrypoint-initdb.d/init.sql
         healthcheck:
             test:
                 [
