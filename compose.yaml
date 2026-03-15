@@ -21,6 +21,7 @@
 #   - entrypoint
 #   - command
 
+# Common Airflow Attributes
 x-airflow-common: &airflow-common
     image: apache/airflow:3.1.8
     user: 50000:0
@@ -53,8 +54,9 @@ services:
             retries: 3
 
     # --------------------------------------------------------------------
-    # DB services
+    # DB Services
 
+    # Main Data Warehouse
     db-redditor:
         image: postgres:15
         container_name: db-redditor
@@ -77,6 +79,7 @@ services:
             retries: 5
             start_period: 5s
 
+    # Airflow State DB
     db-airflow:
         image: postgres:15
         container_name: db-airflow
@@ -99,6 +102,7 @@ services:
             retries: 5
             start_period: 5s
 
+    # Superset DB
     db-superset:
         image: postgres:15
         container_name: db-superset
@@ -120,6 +124,7 @@ services:
             interval: 10s
             retries: 5
             start_period: 5s
+
     # DB monitoring
     adminer:
         image: adminer:5.4.2
@@ -128,8 +133,9 @@ services:
             - 8080:8080
 
     # --------------------------------------------------------------------
-    # Spark services
+    # Spark Services
 
+    # Master Spark
     spark-master:
         image: apache/spark:4.0.2
         container_name: spark-master
@@ -146,6 +152,7 @@ services:
             /opt/spark/bin/spark-class
             org.apache.spark.deploy.master.Master
 
+    # Spark Worker(s)
     spark-worker-1:
         image: apache/spark:4.0.2
         container_name: spark-worker-1
@@ -163,9 +170,9 @@ services:
             spark://spark-master:7077
 
     # --------------------------------------------------------------------
-    # Airflow services
+    # Airflow Services
 
-    # Initialize all necessary Airflow components
+    # Initialize Airflow Components
     airflow-init:
         <<: *airflow-common
         container_name: airflow-init
@@ -180,7 +187,7 @@ services:
         command:
             - /opt/airflow/init.sh
 
-    # API server - communication
+    # API Server -> Communication
     airflow-apiserver:
         <<: *airflow-common
         container_name: airflow-apiserver
@@ -231,8 +238,9 @@ services:
         restart: always
 
     # --------------------------------------------------------------------
-    # Superset services
+    # Superset Services
 
+    # Initialize Superset Settings
     superset-init:
         image: apache/superset:GHA-23081398393
         container_name: superset-init
@@ -248,6 +256,7 @@ services:
         command:
             - /app/superset/init.sh
 
+    # Run Superset
     superset:
         image: apache/superset:GHA-23081398393
         container_name: superset
@@ -258,7 +267,7 @@ services:
         volumes:
             - ./setup/superset/superset_config.py:/app/superset/superset_config.py
         depends_on:
-            superset-init:
-                condition: service_completed_successfully
             db-superset:
                 condition: service_healthy
+            superset-init:
+                condition: service_completed_successfully
