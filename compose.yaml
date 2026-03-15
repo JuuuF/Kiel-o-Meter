@@ -15,8 +15,8 @@
 #   Storage
 #   - volumes
 #   Lifecycle
-#   - depends_on
 #   - healthcheck
+#   - depends_on
 #   - restart
 #   - entrypoint
 #   - command
