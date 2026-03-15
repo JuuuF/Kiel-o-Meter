@@ -175,7 +175,7 @@ services:
             timeout: 30s
             retries: 50
             start_period: 30s
-        # restart: always
+        restart: always
 
     # --------------------------------------------------------------------
     # Superset services
