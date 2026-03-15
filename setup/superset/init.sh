@@ -14,7 +14,7 @@ superset fab create-admin \
 	--email "$SUPERSET_ADMIN_EMAIL" \
 	--password "$SUPERSET_ADMIN_PASSWORD"
 
-init_step "Updating DB"
+init_step "Upgrading DB"
 superset db upgrade
 
 init_step "Initializing"
