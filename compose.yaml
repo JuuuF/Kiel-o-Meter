@@ -40,6 +40,7 @@ services:
         container_name: data_collector
         volumes:
             - ./src/data_collection:/opt/data_collection
+        restart: always
         entrypoint: python
         command: /opt/data_collection/collect.py
 
