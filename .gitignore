@@ -4,6 +4,7 @@ data/
 
 # Do not expose secrets
 secrets/*
+!secrets/.gitkeep
 
 # Ignore workspace files
 *.code-workspace
