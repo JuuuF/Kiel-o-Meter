@@ -38,6 +38,10 @@ services:
     data_collector:
         image: python:3.14-slim
         container_name: data_collector
+        volumes:
+            - ./src/data_collection:/opt/data_collection
+        entrypoint: python
+        command: /opt/data_collection/collect.py
 
     # --------------------------------------------------------------------
     # Data Lake
