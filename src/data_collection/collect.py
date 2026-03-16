@@ -5,7 +5,7 @@ from time import sleep
 def collect_data():
     print("Service up.")
     while True:
-        print("Data Collection Mock.")
+        print("Data Collection Mock.", flush=True)
         sleep(5)
 
 
