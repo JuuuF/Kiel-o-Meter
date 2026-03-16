@@ -32,6 +32,14 @@ x-airflow-common: &airflow-common
             condition: service_healthy
 
 services:
+
+    # --------------------------------------------------------------------
+    # Data Collection
+
+    data_collector:
+        image: python:3.14-slim
+        container_name: data_collector
+
     # --------------------------------------------------------------------
     # Data Lake
 
