@@ -15,7 +15,7 @@ def collect_data():
         res = networking.fetch_stop(c.kvg_stop_mapping["stops"][0]["id"])
         print(res)
         print(end="", flush=True)
-        sleep(5)
+        sleep(c.FECTH_DELAY)
 
 
 if __name__ == "__main__":
