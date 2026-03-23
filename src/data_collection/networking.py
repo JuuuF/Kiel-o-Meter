@@ -6,6 +6,11 @@ import json
 import requests
 
 
+# Build URL to request stops, based on ID
+def get_stop_request_url_from_id(id: int):
+    return f"{c.kvg_stop_url}?stop={id}&mode=departure"
+
+
 # Fetch a single stop, based on ID
 def fetch_stop(id: int) -> str:
 
