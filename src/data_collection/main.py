@@ -10,7 +10,7 @@ from datetime import datetime
 
 # Print the system status variables
 def print_status():
-    print(f"Fetching every {c.FECTH_DELAY} seconds.")
+    print(f"Fetching every {c.FETCH_DELAY} seconds.")
     print(end="", flush=True)
 
 
@@ -42,7 +42,7 @@ def collect_data():
             ensure_ascii=False,
         )
         print(end="", flush=True)
-        sleep(c.FECTH_DELAY)
+        sleep(c.FETCH_DELAY)
 
 
 if __name__ == "__main__":

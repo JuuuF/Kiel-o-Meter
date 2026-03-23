@@ -32,4 +32,4 @@ kvg_platforms_url = kvg_base_url + _geoservice_path + "/services/stopinfo/stopPo
 # ------------------------------------------------------------------------
 # Fetching Loop Variables
 
-FECTH_DELAY = int(environ.get("DC__FECTH__DELAY", default=5))
+FETCH_DELAY = int(environ.get("DC__FETCH__DELAY", default=5))
