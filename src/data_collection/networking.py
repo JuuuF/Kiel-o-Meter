@@ -2,39 +2,51 @@
 import constants as c
 
 # Python module imports
+import aiohttp
+import asyncio
 import json
 import requests
 from functools import cache
+from time import time
 
 
 # Build URL to request stops, based on ID
 @cache
-def get_stop_request_url_from_id(id: int):
+def get_stop_request_url_from_id(id: int) -> str:
     return f"{c.kvg_stop_url}?stop={id}&mode=departure"
 
 
-# Fetch a single stop, based on ID
-def fetch_stop(id: int) -> str:
+# Fetch a single stop asynchronously
+async def fetch_stop_async(session: aiohttp.ClientSession, url: str) -> str:
+    try:
+        async with session.get(url, timeout=5) as response:
+            if response.status != 200:
+                return "{}"
+            single_stop_data = await response.text()
 
-    # Build url
-    request_url = get_stop_request_url_from_id(id)
-
-    # Fetch results
-    resp = requests.get(request_url)
-    if not resp.ok:
-        print("[ERROR] Invalid response after fetching:", resp.status_code)
+        return single_stop_data
+    except Exception as e:
+        print(f"[ERROR] Connection failed: {e}")
         return "{}"
 
-    return json.loads(resp.text)
+
+# Fetch all stops asynchronously
+async def fetch_all_stops_async():
+    async with aiohttp.ClientSession() as session:
+        tasks = [
+            fetch_stop_async(session, get_stop_request_url_from_id(stop["id"]))
+            for stop in c.kvg_stop_mapping["stops"]
+        ]
+        all_stops_data = await asyncio.gather(*tasks)
+    return all_stops_data
 
 
 # Fetch all known stops
 def fetch_all_stops() -> list[str]:
 
     # Collect stop data
-    all_stops = []
-    for stop in c.kvg_stop_mapping["stops"]:
-        s = fetch_stop(stop["id"])
-        all_stops.append(s)
+    start = time()
+    all_stops = asyncio.run(fetch_all_stops_async())
+    print(f"Fetched data in {time() - start:.2f}s", flush=True)
 
     return all_stops
