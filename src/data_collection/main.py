@@ -1,6 +1,7 @@
 # User module imports
 import constants as c
 import networking
+import storage
 
 # Python module imports
 import json
@@ -21,26 +22,12 @@ def collect_data():
 
     while True:
         print("Fetching data...", flush=True)
-        fetch_time = datetime.now()
-        res = networking.fetch_all_stops()
+        data = networking.fetch_all_stops()
 
-        # Save results
-        res_dict = dict(
-            fetched_data=[
-                {
-                    "stop": stop["stop"],
-                    "fetched_result": fetched,
-                    "time": str(fetch_time),
-                }
-                for fetched, stop in zip(res, c.kvg_stop_mapping["stops"])
-            ]
-        )
+        data_dict = storage.convert_fetched_data_to_dict(data)
 
-        json.dump(
-            res_dict,
-            open("/opt/data_collection/output.json", "w"),
-            ensure_ascii=False,
-        )
+        storage.store_data(data_dict)
+
         print(end="", flush=True)
         sleep(c.FETCH_DELAY)
 
