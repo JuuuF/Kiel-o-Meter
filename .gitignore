@@ -8,3 +8,6 @@ secrets/*
 
 # Ignore workspace files
 *.code-workspace
+
+# Ignore python cache
+__pycache__
