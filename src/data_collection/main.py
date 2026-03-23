@@ -7,9 +7,15 @@ from time import sleep
 from os import environ
 
 
+# Print the system status variables
+def print_status():
+    print(f"Fetching every {c.FECTH_DELAY} seconds.")
+    print(end="", flush=True)
+
 # Mock for data collection function
 def collect_data():
     print("Service up.")
+    print_status()
     while True:
         print("Data Collection Mock.")
         res = networking.fetch_stop(c.kvg_stop_mapping["stops"][0]["id"])
