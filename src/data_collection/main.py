@@ -11,8 +11,9 @@ from datetime import datetime
 
 # Print the system status variables
 def print_status():
-    print(f"Fetching every {c.FETCH_DELAY} seconds.")
-    print(end="", flush=True)
+    print(f"[INFO] Fetching every {c.FETCH_DELAY} seconds.")
+    print(f"[INFO] Fetching timeout: {c.FETCH_TIMEOUT} seconds.")
+    print(flush=True)
 
 
 # Mock for data collection function

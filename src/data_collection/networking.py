@@ -1,5 +1,6 @@
 # User module imports
 import constants as c
+import mapping as m
 
 # Python module imports
 import aiohttp
@@ -26,7 +27,9 @@ async def fetch_stop_async(session: aiohttp.ClientSession, url: str) -> str:
 
         return single_stop_data
     except Exception as e:
-        print(f"[ERROR] Connection failed: {e}")
+        stop_id = int(url.split("stop=")[1].split("&")[0])
+        print(f"[ERROR] Connection failed for stop '{m.get_stop_by_id(stop_id)['stop']}' (id={stop_id})")
+        print(f"[ERROR] {e}")
         return "{}"
 
 
