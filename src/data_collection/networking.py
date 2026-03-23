@@ -15,12 +15,7 @@ def get_stop_request_url_from_id(id: int):
 def fetch_stop(id: int) -> str:
 
     # Build url
-    url = c.kvg_stop_url
-    params = [
-        f"stop={id}",
-        "mode=departure",
-    ]
-    request_url = f"{url}?{'&'.join(params)}"
+    request_url = get_stop_request_url_from_id(id)
 
     # Fetch results
     resp = requests.get(request_url)
