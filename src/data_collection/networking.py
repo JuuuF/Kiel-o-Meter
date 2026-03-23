@@ -1,15 +1,16 @@
 # User module imports
-import constants
+import constants as c
 
 # Python module imports
 import json
 import requests
 
 
+# Fetch a single stop, based on ID
 def fetch_stop(id: int) -> str:
 
     # Build url
-    url = constants.kvg_stop_url
+    url = c.kvg_stop_url
     params = [
         f"stop={id}",
         "mode=departure",
