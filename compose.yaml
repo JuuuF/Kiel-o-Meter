@@ -44,7 +44,7 @@ services:
             - ./src/data_collection:/opt/data_collection
         restart: always
         entrypoint: python
-        command: /opt/data_collection/collect.py
+        command: /opt/data_collection/main.py
 
     # --------------------------------------------------------------------
     # Data Lake
