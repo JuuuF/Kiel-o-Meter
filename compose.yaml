@@ -36,7 +36,7 @@ services:
     # Data Collection
 
     data_collector:
-        image: python:3.14-slim
+        build: ./setup/data_collection/
         container_name: data_collector
         env_file:
             - setup/data_collection/config.env
