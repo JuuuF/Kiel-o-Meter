@@ -11,3 +11,6 @@ secrets/*
 
 # Ignore python cache
 __pycache__
+
+# Output files
+**/output.json
