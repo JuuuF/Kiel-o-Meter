@@ -42,6 +42,9 @@ services:
             - setup/data_collection/config.env
         volumes:
             - ./src/data_collection:/opt/data_collection
+        depends_on:
+            minio:
+                condition: service_healthy
         restart: always
         entrypoint: python
         command: /opt/data_collection/main.py
