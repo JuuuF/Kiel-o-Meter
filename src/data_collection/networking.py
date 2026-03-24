@@ -18,16 +18,16 @@ def get_stop_request_url_from_id(id: int) -> str:
 
 
 # Fetch a single stop asynchronously
-async def fetch_stop_async(session: aiohttp.ClientSession, url: str) -> str:
+async def fetch_stop_async(session: aiohttp.ClientSession, url: str) -> dict:
     n_tries = 0
     while n_tries < c.FETCH_RETRIES:
         try:
             async with session.get(url, timeout=c.FETCH_TIMEOUT) as response:
                 if response.status != 200:
-                    return "{}"
+                    break
                 single_stop_data = await response.text()
 
-            return single_stop_data
+            return dict(json.loads(single_stop_data))
         except Exception as e:
             stop_id = int(url.split("stop=")[1].split("&")[0])
             n_tries += 1
@@ -40,11 +40,11 @@ async def fetch_stop_async(session: aiohttp.ClientSession, url: str) -> str:
                 print(f"[{log_level}] Aborting.")
             else:
                 print(f"[{log_level}] Retrying... ({n_tries}/{c.FETCH_RETRIES})")
-    return "{}"
+    return {}
 
 
 # Fetch all stops asynchronously
-async def fetch_all_stops_async():
+async def fetch_all_stops_async() -> list[dict]:
     async with aiohttp.ClientSession() as session:
         tasks = [
             fetch_stop_async(session, get_stop_request_url_from_id(stop["id"]))
@@ -55,7 +55,7 @@ async def fetch_all_stops_async():
 
 
 # Fetch all known stops
-def fetch_all_stops() -> list[str]:
+def fetch_all_stops() -> list[dict]:
 
     # Collect stop data
     print("Fetching data...", flush=True, end=" ")

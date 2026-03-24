@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 # Conversion from fetched data to python dictionary
-def convert_fetched_data_to_dict(data: list[str]) -> dict:
+def convert_fetched_data_to_dict(data: list[dict]) -> dict:
 
     # Get current time as fetched time
     fetch_time = datetime.now()
