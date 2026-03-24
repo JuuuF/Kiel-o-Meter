@@ -11,8 +11,9 @@ from datetime import datetime
 
 # Print the system status variables
 def print_status():
-    print(f"[INFO] Fetching every {c.FETCH_DELAY} seconds.")
+    print(f"[INFO] Fetching interval {c.FETCH_DELAY} seconds.")
     print(f"[INFO] Fetching timeout: {c.FETCH_TIMEOUT} seconds.")
+    print(f"[INFO] Fetching retries: {c.FETCH_RETRIES}.")
     print(flush=True)
 
 

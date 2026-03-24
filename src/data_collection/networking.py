@@ -30,13 +30,16 @@ async def fetch_stop_async(session: aiohttp.ClientSession, url: str) -> str:
             return single_stop_data
         except Exception as e:
             stop_id = int(url.split("stop=")[1].split("&")[0])
-            print(
-                f"[ERROR] Connection failed for stop '{m.get_stop_by_id(stop_id)['stop']}' (id={stop_id})"
-            )
-            print(f"[ERROR] {e}")
             n_tries += 1
-            if n_tries != c.FETCH_RETRIES:
-                print("[ERROR] Retrying...")
+            log_level = "ERROR" if n_tries == c.FETCH_DELAY else "WARNING"
+            print(
+                f"[{log_level}] Connection failed for stop '{m.get_stop_by_id(stop_id)['stop']}' (id={stop_id})"
+            )
+            print(f"[{log_level}] {e}")
+            if n_tries == c.FETCH_RETRIES:
+                print(f"[{log_level}] Aborting.")
+            else:
+                print(f"[{log_level}] Retrying... ({n_tries}/{c.FETCH_RETRIES})")
     return "{}"
 
 
