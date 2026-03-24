@@ -72,3 +72,53 @@ Your collector works when:
 - [X] Each data includes metadata (arrive times, departure times etc.)
 - [X] The script runs repeatedly without crashing
 - [X] Results are saved locally as JSON
+
+## Week 3 - Data Lake Design
+
+### W3 Goal
+
+Create the raw data lake.
+
+Instead of JSON files, data is stored as Parquet datasets in MinIO.
+
+### W3 Tasks
+
+- Convert JSON → Parquet
+- Upload Parquet files to MinIO
+- Create partition structure
+
+Example structure:
+
+```plaintext
+data_lake/
+   raw/
+      reddit/
+         year=2026/
+            month=03/
+               day=15/
+                  posts.parquet
+```
+
+### W3 Techniques to Learn
+
+- Columnar storage
+- Parquet format
+- Data partitioning
+- Object storage
+- S3 APIs
+
+Libraries:
+
+- pyarrow
+- boto3
+- s3fs
+
+### W3 Checklist
+
+Your data lake works when:
+
+- [ ] KVG data is stored in Parquet format
+- [ ] Files are partitioned by date
+- [ ] Data uploads successfully to MinIO
+- [ ] Data can be downloaded again
+- [ ] Schema remains consistent across files
