@@ -55,8 +55,9 @@ async def fetch_all_stops_async():
 def fetch_all_stops() -> list[str]:
 
     # Collect stop data
+    print("Fetching data...", flush=True, end=" ")
     start = time()
     all_stops = asyncio.run(fetch_all_stops_async())
-    print(f"Fetched data in {time() - start:.2f}s", flush=True)
+    print(f"Done in {time() - start:.2f}s", flush=True)
 
     return all_stops

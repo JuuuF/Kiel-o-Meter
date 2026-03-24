@@ -22,14 +22,12 @@ def collect_data():
     print_status()
 
     while True:
-        print("Fetching data...", flush=True)
         data = networking.fetch_all_stops()
 
         data_dict = storage.convert_fetched_data_to_dict(data)
 
         storage.store_data(data_dict)
 
-        print(end="", flush=True)
         sleep(c.FETCH_DELAY)
 
 
