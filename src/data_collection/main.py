@@ -28,6 +28,8 @@ def collect_data():
 
         storage.store_data(data_dict)
 
+        # FIXME: Deploy collector thread with timeout to keep exact timings.
+        # Currently, the delay is waited for after fetching, increasing loop time to fetch + delay
         sleep(c.FETCH_DELAY)
 
 
