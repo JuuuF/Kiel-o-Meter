@@ -1,0 +1,61 @@
+actual:
+  # From actual itself
+  actualRelativeTime:
+  (actualTime): empty if not existing
+  direction:
+  mixedTime:
+  passageid:
+  patternText:
+  plannedTime:
+  routeId:
+  status:
+  tripId:
+  (vehicleId): empty if not existing
+
+  # From routes
+  routeAlerts: routes/<routeId>/alerts
+  routeAuthority: routes/<routeId>/authority
+  routeDirections: routes/<routeId>/directions
+  # routeId: routes/<routeId>/id # -> already exists
+  # routeName: routes/<routeId>/name # -> this is the same as "patternText"
+  routeType: routes/<routeId>/routeType
+  routeShortName: routes/<routeId>/shortName
+
+  # From parent
+  directions:
+  firstPassageTime:
+  generalAlerts:
+  lastPassageTime:
+  stopName:
+  stopShortName:
+  fetchTime:
+
+old:
+  # From old itself
+  actualRelativeTime:
+  direction:
+  mixedTime:
+  passageid:
+  patternText:
+  routeId:
+  status:
+  tripId:
+  (vehicleId): empty if not existing
+
+  # From routes
+  routeAlerts: routes/<routeId>/alerts
+  routeAuthority: routes/<routeId>/authority
+  routeDirections: routes/<routeId>/directions
+  # routeId: routes/<routeId>/id # -> already exists
+  # routeName: routes/<routeId>/name # -> this is the same as "patternText"
+  routeType: routes/<routeId>/routeType
+  routeShortName: routes/<routeId>/shortName
+
+  # From parent
+  directions:
+  firstPassageTime:
+  generalAlerts:
+  lastPassageTime:
+  stopName:
+  stopShortName:
+  fetchTime:
