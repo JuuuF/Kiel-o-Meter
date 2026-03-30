@@ -9,6 +9,7 @@ import json
 import requests
 from functools import cache
 from time import time
+from email.utils import parsedate_to_datetime
 
 
 # Build URL to request stops, based on ID
@@ -27,7 +28,16 @@ async def fetch_stop_async(session: aiohttp.ClientSession, url: str) -> dict:
                     break
                 single_stop_data = await response.text()
 
-            return dict(json.loads(single_stop_data))
+            # Convert response to dict
+            out_dict = dict(json.loads(single_stop_data))
+
+            # Add time information
+            fetch_time = response.headers.get("Date")
+            out_dict["fetchTime"] = (
+                str(parsedate_to_datetime(fetch_time)) if fetch_time else ""
+            )
+
+            return out_dict
         except Exception as e:
             stop_id = int(url.split("stop=")[1].split("&")[0])
             n_tries += 1
