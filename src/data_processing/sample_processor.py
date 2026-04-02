@@ -9,6 +9,7 @@ from hashlib import md5
 
 T = TypeVar("T", bound="ConfigLoadable")
 
+
 class ConfigLoadable:
     """
     Class template to store and load class instances, as defined by its member variables.
@@ -51,6 +52,46 @@ class SampleProcessor(ConfigLoadable):
         self.processed_files = processed_files or set()
 
         super().__init__(**kwargs)
+
+    # --------------------------------------------------------------------
+    # Data Lake communication
+
+    def get_raw_file_from_data_lake(self: Self, filepath: str) -> dict:
+        """
+        Retrieve a raw file from the data lake using its file path.
+        """
+        # TODO: implement
+        return {}
+
+    def get_files_in_data_lake(self: Self) -> list[str]:
+        """
+        Get a list of all files present in the data lake.
+        """
+        # TODO: implement
+        return []
+
+    def get_unprocessed_files_in_data_lake(self: Self) -> list[str]:
+        """
+        Get a list of all unprocessed files in the data lake.
+        """
+        # TODO: implement
+        return []
+
+    # --------------------------------------------------------------------
+    # File Processing
+
+    def process_single_file(self: Self, filepath: str) -> None:
+        """
+        Process a single file from the data lake, refered to by its file path.
+        """
+        # TODO: implement
+        return
+
+    def update_database(self: Self) -> None:
+        """
+        Check all files in the data lake and process files that are not yet present in the database.
+        """
+        return
 
     # --------------------------------------------------------------------
     # Hashing and storage functions
