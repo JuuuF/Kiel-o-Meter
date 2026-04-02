@@ -1,10 +1,12 @@
+# User module imports
+import constants as c
+
 # Python module imports
 import pickle
 from pathlib import Path
 from typing import Self, Any
 
 
-# Class template to store and load the class state, as defined by its member variables
 class ConfigLoadable:
     """
     Class template to store and load class instances, as defined by its member variables.
@@ -34,3 +36,23 @@ class ConfigLoadable:
         """
         with open(config_filepath, "wb") as f:
             pickle.dump(self.get_config(), f)
+
+
+class SampleProcessor(ConfigLoadable):
+    def __init__(
+        self: Self,
+        **kwargs: dict,
+    ) -> None:
+        super().__init__(**kwargs)
+
+    def save(self: Self) -> None:
+        """
+        Save to the default data processor config file path.
+        """
+        self.save_config(c.DATA_PROCESSOR_CONFIG_PATH)
+
+    def load() -> Self:
+        """
+        Load from the default data processor config file path.
+        """
+        return SampleProcessor.from_config(c.DATA_PROCESSOR_CONFIG_PATH)
