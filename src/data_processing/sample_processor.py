@@ -97,8 +97,16 @@ class SampleProcessor(ConfigLoadable):
         """
         Retrieve a raw file from the data lake using its file path.
         """
-        # TODO: implement
-        return {}
+        # Read compressed data
+        response = client.get_object(c.MINIO_BUCKET_RAW, filepath)
+        data_buffer = BytesIO(response.read())
+        # Convert to DataFrame
+        table = pq.read_table(data_buffer)
+        df: pd.DataFrame = table.to_pandas()
+        # Convert to dict
+        data_dict = df.to_dict()
+
+        return data_dict
 
     def get_all_files_in_data_lake(self: Self) -> list[str]:
         """
@@ -119,7 +127,7 @@ class SampleProcessor(ConfigLoadable):
         """
         # Get all files
         all_files = self.get_all_files_in_data_lake()
-        
+
         # Return if there are no files in the data lake
         if len(all_files) == 0:
             return None
@@ -148,7 +156,7 @@ class SampleProcessor(ConfigLoadable):
 
         if not self.is_processed(all_files[lower]):
             return all_files[lower]
-        
+
         return all_files[upper]
 
     # --------------------------------------------------------------------
