@@ -52,6 +52,21 @@ class SampleProcessor(ConfigLoadable):
 
         super().__init__(**kwargs)
 
+    # --------------------------------------------------------------------
+    # Hashing and storage functions
+
+    def _get_hash(self: Self, filename: str) -> str:
+        return md5(filename.encode()).hexdigest()
+
+    def mark_as_processed(self: Self, filename: str) -> None:
+        self.processed_files.add(self._get_hash(filename))
+
+    def is_processed(self: Self, filename: str) -> bool:
+        return self._get_hash(filename) in self.processed_files
+
+    # --------------------------------------------------------------------
+    # Config saving and loading
+
     def save(self: Self) -> None:
         """
         Save to the default data processor config file path.
