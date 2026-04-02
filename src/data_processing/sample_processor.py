@@ -96,6 +96,44 @@ class SampleProcessor(ConfigLoadable):
         )
         return sorted([f.object_name for f in objects])
 
+    def get_oldest_unprocessed_file(self: Self) -> str | None:
+        """
+        Query the data lake for the oldest non-processed file.
+        """
+        # Get all files
+        all_files = self.get_all_files_in_data_lake()
+        
+        # Return if there are no files in the data lake
+        if len(all_files) == 0:
+            return None
+
+        # Return if everything's processed
+        if self.is_processed(all_files[-1]):
+            return None
+
+        # Binary search under the assumption that files are processed by date
+        def get_mid(l: int, u: int) -> int:
+            return l + (u - l) // 2
+
+        def update_lmu(l: int, m: int, u: int, use_upper: bool) -> list[int, int, int]:
+            if use_upper:
+                return m, get_mid(m, u), u
+            return l, get_mid(l, m), m
+
+        lower = 0
+        upper = len(all_files) - 1
+        midpt = get_mid(lower, upper)
+        # print(lower, midpt, upper)
+
+        while lower + 1 < upper:
+            is_midpt_processed = self.is_processed(all_files[midpt])
+            lower, midpt, upper = update_lmu(lower, midpt, upper, is_midpt_processed)
+
+        if not self.is_processed(all_files[lower]):
+            return all_files[lower]
+        
+        return all_files[upper]
+
     def get_unprocessed_files_in_data_lake(self: Self) -> list[str]:
         """
         Get a list of all unprocessed files in the data lake.
