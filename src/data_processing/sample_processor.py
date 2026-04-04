@@ -248,7 +248,11 @@ class SampleProcessor(ConfigLoadable):
         for stops_data in fetched_data:
 
             # Stops consist of previous and current/predicted stops
-            all_stops = list(stops_data["old"]) + list(stops_data["actual"])
+            all_stops = list(
+                stops_data["old"] if stops_data["old"] is not None else []
+            ) + list(
+                stops_data["actual"] if stops_data["actual"] is not None else []
+            )
 
             # No stops, no worry
             if len(all_stops) == 0:
