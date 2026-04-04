@@ -4,6 +4,9 @@ import constants as c
 # Python module imports
 import os
 import pickle
+import pandas as pd
+import pyarrow.parquet as pq
+from io import BytesIO
 from pathlib import Path
 from typing import Self, Any, TypeVar, Type
 from hashlib import md5
