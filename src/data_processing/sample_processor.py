@@ -89,14 +89,14 @@ class SampleProcessor(ConfigLoadable):
         self.data_lake_user = data_lake_user or c.MINIO_ROOT_USER
         self.data_lake_password = data_lake_password or c.MINIO_ROOT_PASSWORD
         self.data_lake_bucket = data_lake_bucket or c.MINIO_BUCKET_RAW
-        self.processed_files = processed_files or set()
+        self.hashed_processed_files = processed_files or set()
 
         init_client(self.data_lake_user, self.data_lake_password)
 
     # --------------------------------------------------------------------
     # Data Lake communication
 
-    def wait_for_data_lake(self: Self):
+    def wait_for_data_lake(self: Self) -> None:
         """
         In case the data lake is not set up, we wait until it is.
         """
@@ -321,10 +321,10 @@ class SampleProcessor(ConfigLoadable):
         return md5(filename.encode()).hexdigest()
 
     def mark_as_processed(self: Self, filename: str) -> None:
-        self.processed_files.add(self._get_hash(filename))
+        self.hashed_processed_files.add(self._get_hash(filename))
 
     def is_processed(self: Self, filename: str) -> bool:
-        return self._get_hash(filename) in self.processed_files
+        return self._get_hash(filename) in self.hashed_processed_files
 
     # --------------------------------------------------------------------
     # Config saving and loading
