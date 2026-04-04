@@ -281,7 +281,8 @@ class SampleProcessor(ConfigLoadable):
         Process a single file from the data lake, refered to by its file path.
         """
 
-        print(f"Processing file {filename}...", flush=True)
+        log_id = f"[{int(hash(filename) % 1e6):06d}]"
+        print(log_id, f"Processing file '{filename}'...", flush=True)
         # Get data
         data = self.get_raw_file_from_data_lake(filename)
 
@@ -297,7 +298,7 @@ class SampleProcessor(ConfigLoadable):
         # Save current state
         self.save()
 
-        print(f"Done processing file {filename}.", flush=True)
+        print(log_id, f"Done", flush=True)
 
     def update_database(self: Self) -> None:
         """
