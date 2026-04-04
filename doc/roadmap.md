@@ -117,8 +117,8 @@ Libraries:
 
 Your data lake works when:
 
-- [ ] KVG data is stored in Parquet format
+- [X] KVG data is stored in Parquet format
 - [ ] Files are partitioned by date
-- [ ] Data uploads successfully to MinIO
-- [ ] Data can be downloaded again
-- [ ] Schema remains consistent across files
+- [X] Data uploads successfully to MinIO
+- [X] Data can be downloaded again
+- [X] Schema remains consistent across files
