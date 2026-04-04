@@ -191,9 +191,13 @@ class SampleProcessor(ConfigLoadable):
 
         return out_routes
 
-    def gather_halts_data(self: Self, fetched_data: list[dict]) -> list[dict]:
+    def gather_halts_data(self: Self, fetched_data: list[dict], data_lake_source_file: str) -> list[dict]:
 
         halts_data = []
+
+        general_file_info = {
+            "data_lake_source_file": data_lake_source_file,
+        }
 
         for stops_data in fetched_data:
 
@@ -229,6 +233,9 @@ class SampleProcessor(ConfigLoadable):
 
                 # Add general stop data
                 single_halt_sample.update(general_stop_info)
+
+                # Add general file info
+                single_halt_sample.update(general_file_info)
 
                 # Convert numpy arrays to python lists
                 for k, v in single_halt_sample.items():
