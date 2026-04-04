@@ -179,6 +179,13 @@ class SampleProcessor(ConfigLoadable):
         return all_files[upper]
 
     # --------------------------------------------------------------------
+    # Database communication
+
+    def store_halts_in_database(self: Self, halts: list[dict]) -> None:
+        # TODO: implement
+        print("WARNING: store_halts_in_database needs implementation!", flush=True)
+
+    # --------------------------------------------------------------------
     # File Processing
 
     def assure_all_stop_keys(self: Self, sample: dict) -> dict:
@@ -206,7 +213,11 @@ class SampleProcessor(ConfigLoadable):
 
         return out_routes
 
-    def gather_halts_data(self: Self, fetched_data: list[dict], data_lake_source_file: str) -> list[dict]:
+    def gather_halts_data(
+        self: Self,
+        fetched_data: list[dict],
+        data_lake_source_file: str,
+    ) -> list[dict]:
 
         halts_data = []
 
@@ -261,11 +272,29 @@ class SampleProcessor(ConfigLoadable):
             # print(flush=True)
         return halts_data
 
-    def process_single_file(self: Self, filepath: str) -> None:
+    def process_single_file(self: Self, filename: str) -> None:
         """
         Process a single file from the data lake, refered to by its file path.
         """
-        # TODO: implement
+
+        print(f"Processing file {filename}...", flush=True)
+        # Get data
+        data = self.get_raw_file_from_data_lake(filename)
+
+        # Convert data
+        all_halts = self.gather_halts_data(data["fetched_data"].values(), filename)
+
+        # Save data
+        self.store_halts_in_database(all_halts)
+
+        # Mark file as processed
+        self.mark_as_processed(filename)
+
+        # Save current state
+        self.save()
+
+        print(f"Done processing file {filename}.", flush=True)
+
         return
 
     def update_database(self: Self) -> None:
@@ -281,8 +310,6 @@ class SampleProcessor(ConfigLoadable):
         start_index = all_files.index(start_file)
         for file in all_files[start_index:]:
             self.process_single_file(file)
-            # self.mark_as_processed(file)
-            # self.save()
 
     # --------------------------------------------------------------------
     # Hashing and storage functions
