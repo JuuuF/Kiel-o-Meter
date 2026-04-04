@@ -62,20 +62,6 @@ class ConfigLoadable:
 
 class SampleProcessor(ConfigLoadable):
 
-    stop_keys = [
-        "actualRelativeTime",
-        "actualTime",
-        "direction",
-        "mixedTime",
-        "passageid",
-        "patternText",
-        "plannedTime",
-        "routeId",
-        "status",
-        "tripId",
-        "vehicleId",
-    ]
-
     def __init__(
         self: Self,
         data_lake_user: str | None = None,
@@ -152,7 +138,7 @@ class SampleProcessor(ConfigLoadable):
             return None
 
         # Return if everything's processed
-        if self.is_processed(all_files[-1]):
+        if self.is_filename_processed(all_files[-1]):
             return None
 
         # Binary search under the assumption that files are processed by date
@@ -167,25 +153,27 @@ class SampleProcessor(ConfigLoadable):
         lower = 0
         upper = len(all_files) - 1
         midpt = get_mid(lower, upper)
-        # print(lower, midpt, upper)
 
         while lower + 1 < upper:
-            is_midpt_processed = self.is_processed(all_files[midpt])
+            is_midpt_processed = self.is_filename_processed(all_files[midpt])
             lower, midpt, upper = update_lmu(lower, midpt, upper, is_midpt_processed)
 
-        if not self.is_processed(all_files[lower]):
+        if not self.is_filename_processed(all_files[lower]):
             return all_files[lower]
 
         return all_files[upper]
 
     def data_lake_has_unprocessed_files(self: Self) -> bool:
         data_lake_files = self.get_all_files_in_data_lake()
-        return not self.is_processed(data_lake_files[-1])
+        return not self.is_filename_processed(data_lake_files[-1])
 
     # --------------------------------------------------------------------
     # Database communication
 
     def store_halts_in_database(self: Self, halts: list[dict]) -> None:
+        """
+        Store the collected halts in the database.
+        """
         # TODO: implement
         print("WARNING: store_halts_in_database needs implementation!", flush=True)
 
@@ -193,12 +181,34 @@ class SampleProcessor(ConfigLoadable):
     # File Processing
 
     def assure_all_stop_keys(self: Self, sample: dict) -> dict:
-        for key in self.stop_keys:
+        """
+        For a given stop sample, assure all possible keys have a value.
+
+        When fetching the data from the API, sometimes certain keys are not present.
+        Therefore we add them here
+        """
+        stop_keys = [
+            "actualRelativeTime",
+            "actualTime",
+            "direction",
+            "mixedTime",
+            "passageid",
+            "patternText",
+            "plannedTime",
+            "routeId",
+            "status",
+            "tripId",
+            "vehicleId",
+        ]
+        for key in stop_keys:
             if key not in sample.keys():
                 sample[key] = None
         return sample
 
     def get_stop_routes(self: Self, routes: list[dict]) -> dict:
+        """
+        Collect the routes information in a lookup table.
+        """
         out_routes = {r["id"]: {} for r in routes}
         for route in routes:
             # Append "route" prefix to route keys
@@ -222,6 +232,12 @@ class SampleProcessor(ConfigLoadable):
         fetched_data: list[dict],
         data_lake_source_file: str,
     ) -> list[dict]:
+        """
+        Gather the information of all halts in the fetched data.
+
+        The data will be flattened in order to contain all relevant information without hierarchical order.
+        Also, all information about stops is returned in a uniform manner.
+        """
 
         halts_data = []
 
@@ -273,7 +289,6 @@ class SampleProcessor(ConfigLoadable):
                         single_halt_sample[k] = list(v)
 
                 halts_data.append(single_halt_sample)
-            # print(flush=True)
         return halts_data
 
     def process_single_file(self: Self, filename: str) -> None:
@@ -293,7 +308,7 @@ class SampleProcessor(ConfigLoadable):
         self.store_halts_in_database(all_halts)
 
         # Mark file as processed
-        self.mark_as_processed(filename)
+        self.mark_filename_as_processed(filename)
 
         # Save current state
         self.save()
@@ -302,7 +317,7 @@ class SampleProcessor(ConfigLoadable):
 
     def update_database(self: Self) -> None:
         """
-        Check all files in the data lake and process files that are not yet present in the database.
+        Check all files in the data lake and process files with content not yet present in the database.
         """
 
         # Return if everything's up to date
@@ -317,14 +332,14 @@ class SampleProcessor(ConfigLoadable):
     # --------------------------------------------------------------------
     # Hashing and storage functions
 
-    def _get_hash(self: Self, filename: str) -> str:
+    def _get_filename_hash(self: Self, filename: str) -> str:
         return md5(filename.encode()).hexdigest()
 
-    def mark_as_processed(self: Self, filename: str) -> None:
-        self.hashed_processed_files.add(self._get_hash(filename))
+    def mark_filename_as_processed(self: Self, filename: str) -> None:
+        self.hashed_processed_files.add(self._get_filename_hash(filename))
 
-    def is_processed(self: Self, filename: str) -> bool:
-        return self._get_hash(filename) in self.hashed_processed_files
+    def is_filename_processed(self: Self, filename: str) -> bool:
+        return self._get_filename_hash(filename) in self.hashed_processed_files
 
     # --------------------------------------------------------------------
     # Config saving and loading
