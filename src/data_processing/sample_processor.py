@@ -178,6 +178,10 @@ class SampleProcessor(ConfigLoadable):
 
         return all_files[upper]
 
+    def data_lake_has_unprocessed_files(self: Self) -> bool:
+        data_lake_files = self.get_all_files_in_data_lake()
+        return not self.is_processed(data_lake_files[-1])
+
     # --------------------------------------------------------------------
     # Database communication
 
@@ -294,8 +298,6 @@ class SampleProcessor(ConfigLoadable):
         self.save()
 
         print(f"Done processing file {filename}.", flush=True)
-
-        return
 
     def update_database(self: Self) -> None:
         """
