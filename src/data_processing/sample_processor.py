@@ -61,6 +61,21 @@ class ConfigLoadable:
 
 
 class SampleProcessor(ConfigLoadable):
+
+    stop_keys = [
+        "actualRelativeTime",
+        "actualTime",
+        "direction",
+        "mixedTime",
+        "passageid",
+        "patternText",
+        "plannedTime",
+        "routeId",
+        "status",
+        "tripId",
+        "vehicleId",
+    ]
+
     def __init__(
         self: Self,
         data_lake_user: str | None = None,
