@@ -118,7 +118,7 @@ class SampleProcessor(ConfigLoadable):
 
         return data_dict
 
-    def get_all_files_in_data_lake(self: Self) -> list[str]:
+    def get_all_file_names_in_data_lake(self: Self) -> list[str]:
         """
         Get a list of all files present in the data lake.
 
@@ -136,7 +136,7 @@ class SampleProcessor(ConfigLoadable):
         Query the data lake for the oldest non-processed file.
         """
         # Get all files
-        all_files = self.get_all_files_in_data_lake()
+        all_files = self.get_all_file_names_in_data_lake()
 
         # Return if there are no files in the data lake
         if len(all_files) == 0:
@@ -170,7 +170,7 @@ class SampleProcessor(ConfigLoadable):
 
     def data_lake_has_unprocessed_files(self: Self) -> bool:
         # TODO: use meta data database for this logic
-        data_lake_files = self.get_all_files_in_data_lake()
+        data_lake_files = self.get_all_file_names_in_data_lake()
         return len(data_lake_files) > 0 and not self.is_filename_processed(
             data_lake_files[-1]
         )
@@ -338,7 +338,7 @@ class SampleProcessor(ConfigLoadable):
         if (start_file := self.get_oldest_unprocessed_file()) is None:
             return
 
-        all_files = self.get_all_files_in_data_lake()
+        all_files = self.get_all_file_names_in_data_lake()
         start_index = all_files.index(start_file)
         for file in all_files[start_index:]:
             self.process_single_file(file)
