@@ -53,13 +53,15 @@ def store_data(data_dict: dict) -> None:
     json_data_compressed = compress(json_data.encode())
     # Convert to BytesIO
     json_data_compressed_bytes = BytesIO(json_data_compressed)
+    object_name = get_storage_path()
     # Upload to data lake
     client.put_object(
         bucket_name=c.MINIO_BUCKET_RAW,
-        object_name=get_storage_path(),
+        object_name=object_name,
         data=json_data_compressed_bytes,
         length=len(json_data_compressed_bytes.getvalue()),
     )
+    print(f"Uploaded file: {c.MINIO_BUCKET_RAW}:{object_name}", flush=True)
 
 
 def store_data_file(

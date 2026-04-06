@@ -227,7 +227,10 @@ class SampleProcessor(ConfigLoadable):
         self.upload_single_df(df_arrivals, filepath_arrivals)
         self.upload_single_df(df_routes, filepath_routes)
 
-        return filepath_arrivals, filepath_routes
+        return [
+            f"{c.MINIO_BUCKET_PROCESSED}:{file}"
+            for file in [filepath_arrivals, filepath_routes]
+        ]
 
     # --------------------------------------------------------------------
     # File Processing
