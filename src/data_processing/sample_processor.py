@@ -111,7 +111,7 @@ class SampleProcessor(ConfigLoadable):
         self: Self,
         filepath: str,
         as_dict: bool = False,
-    ) -> dict:
+    ) -> str | dict:
         """
         Retrieve a raw file from the data lake using its file path.
         """
