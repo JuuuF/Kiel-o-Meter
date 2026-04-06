@@ -13,13 +13,13 @@ arrival_struct = Struct(
         "actualTime": String,
         "direction": String,
         "mixedTime": String,
-        "passageid": String,  # "Int64"
+        "passageid": Int64,
         "patternText": String,
         "plannedTime": String,
-        "routeId": String,  # "Int64"
+        "routeId": Int64,
         "status": String,
-        "tripId": String,  # "Int64"
-        "vehicleId": String,  # "Int64"
+        "tripId": Int64,
+        "vehicleId": Int64,
     }
 )
 
@@ -28,30 +28,22 @@ routes_struct = Struct(
         "alerts": List(alerts_struct),
         "authority": String,
         "directions": List(String),
-        "id": String,  # "Int64"
+        "id": Int64,
         "name": String,
-        "routeName": String,
+        "routeType": String,
         "shortName": String,
     }
 )
 
-stops_struct = Struct(
-    {
-        "actual": List(arrival_struct),
-        "directions": List(String),
-        "firstPassageTime": Int64,
-        "generalAlerts": List(alerts_struct),
-        "lastPassageTime": Int64,
-        "old": List(arrival_struct),
-        "routes": List(routes_struct),
-        "stopName": String,
-        "stopShortName": String,
-        "fetchTime": String,
-    }
-)
-
-fetched_data_schema = Schema(
-    {
-        "fetched_data": List(stops_struct),
-    }
-)
+fetched_data_dtypes = {
+    "actual": List(arrival_struct),
+    "directions": List(String),
+    "firstPassageTime": Int64,
+    "generalAlerts": List(alerts_struct),
+    "lastPassageTime": Int64,
+    "old": List(arrival_struct),
+    "routes": List(routes_struct),
+    "stopName": String,
+    "stopShortName": String,
+    "fetchTime": String,
+}

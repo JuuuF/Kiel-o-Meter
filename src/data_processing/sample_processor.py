@@ -1,12 +1,13 @@
 # User module imports
 import constants as c
-from schema import fetched_data_schema
+from schema import fetched_data_dtypes
 
 # Python module imports
 import os
 import json
 import pickle
 import polars as pl
+from io import BytesIO
 from time import sleep
 from zlib import decompress
 from minio import Minio
@@ -174,6 +175,9 @@ class SampleProcessor(ConfigLoadable):
         return all_files[upper]
 
     def data_lake_has_unprocessed_files(self: Self) -> bool:
+        """
+        Check to see if there are any unprocessed raw files in the data lake.
+        """
         # TODO: use meta data database for this logic
         data_lake_files = self.get_all_file_names_in_data_lake()
         return len(data_lake_files) > 0 and not self.is_filename_processed(
@@ -183,12 +187,47 @@ class SampleProcessor(ConfigLoadable):
     # --------------------------------------------------------------------
     # Database communication
 
-    def store_processed_halts(self: Self, halts: list[dict]) -> None:
+    def upload_single_df(self: Self, df: pl.DataFrame, filepath: str) -> None:
+        """
+        Store a single Dataframe in the processed data lake bucket.
+        """
+        buffer = BytesIO()
+        df.write_parquet(buffer, compression="zstd")
+        buffer.seek(0)
+        client.put_object(
+            bucket_name=c.MINIO_BUCKET_PROCESSED,
+            object_name=filepath,
+            data=buffer,
+            length=len(buffer.getvalue()),
+        )
+
+    def upload_processed_data(
+        self: Self,
+        df_arrivals: pl.DataFrame,
+        df_routes: pl.DataFrame,
+        src_file: str,
+    ) -> None:
         """
         Store the collected halts in the database.
         """
-        # TODO: implement
-        print("WARNING: store_processed_halts needs implementation!", flush=True)
+
+        # Get filepaths
+        date = [f for f in src_file.split("/") if f.startswith("date=")][0]
+        filename = (
+            src_file.split("/")[-1]
+            .replace(".data", ".parquet")
+            .replace("file", "{type}")
+        )
+        filepath_arrivals = str(
+            Path("processed") / date / filename.format(type="arrivals")
+        )
+        filepath_routes = str(Path("processed") / date / filename.format(type="routes"))
+
+        # Upload files
+        self.upload_single_df(df_arrivals, filepath_arrivals)
+        self.upload_single_df(df_routes, filepath_routes)
+
+        return filepath_arrivals, filepath_routes
 
     # --------------------------------------------------------------------
     # File Processing
@@ -310,6 +349,61 @@ class SampleProcessor(ConfigLoadable):
                 halts_data.append(single_halt_sample)
         return halts_data
 
+    def extract_arrivals(self: Self, df: pl.DataFrame) -> pl.DataFrame:
+        """
+        Extract arrival information from general DataFrame.
+        """
+
+        # Unroll past and current/future arrivals
+        df_arrivals = (
+            df.with_columns(arrivals=pl.concat_list(["actual", "old"]))
+            .explode("arrivals")
+            .unnest("arrivals")
+            .drop(["actual", "old", "routes"])
+            .filter(~pl.col("routeId").is_null())  # Remove entries without arrivals
+        )
+
+        # Uniform time format
+        df_arrivals = df_arrivals.with_columns(
+            pl.from_epoch("firstPassageTime", time_unit="ms")
+            .dt.replace_time_zone("utc")
+            .dt.convert_time_zone("Europe/Berlin"),
+            pl.from_epoch("lastPassageTime", time_unit="ms")
+            .dt.replace_time_zone("utc")
+            .dt.convert_time_zone("Europe/Berlin"),
+            pl.col("fetchTime").str.to_datetime(time_zone="Europe/Berlin"),
+        )
+
+        return df_arrivals
+
+    def extract_routes(self: Self, df: pl.DataFrame) -> pl.DataFrame:
+        """
+        Extract route information from general DataFrame.
+        """
+
+        df_routes = (
+            df.select("routes")
+            .explode("routes")
+            .unnest("routes")
+            .unique()  # Remove duplicates
+            .filter(~pl.all_horizontal(pl.all().is_null()))  # Remove nulls
+        )
+
+        return df_routes
+
+    def convert_data_to_dataframe(self: Self, data: dict) -> pl.DataFrame:
+        """
+        Convert data dict to pl.DataFrame with consistent schema.
+        """
+
+        # Convert to DataFrame
+        df = pl.DataFrame(data["fetched_data"])
+
+        # Enforce correct data types
+        df = df.cast(fetched_data_dtypes)
+
+        return df
+
     def process_single_file(self: Self, filename: str) -> None:
         """
         Process a single file from the data lake, refered to by its file path.
@@ -317,16 +411,24 @@ class SampleProcessor(ConfigLoadable):
 
         log_id = f"[{int(hash(filename) % 1e6):06d}]"
         print(log_id, f"Processing file '{filename}'...", flush=True)
-        # Get data
-        json_data = self.get_raw_file_from_data_lake(filename)
 
-        # Convert to polars data
-        df = pl.read_json(json_data, schema=fetched_data_schema)
-        print(df, flush=True)
+        data = self.get_raw_file_from_data_lake(filename)
+        df = self.convert_data_to_dataframe(data)
+        df_arrivals = self.extract_arrivals(df)
+        df_routes = self.extract_routes(df)
+        uploaded_files = self.upload_processed_data(
+            df_arrivals, df_routes, src_file=filename
+        )
+
+        self.mark_filename_as_processed(filename)
+        self.save()
+
+        print(log_id, "Uploaded files:", ", ".join(uploaded_files), flush=True)
+
+        return
 
         # ---------------------------------------
         # to-be legacy code
-        data = json.loads(json_data)
 
         # Convert data
         all_halts = self.gather_halts_data(data["fetched_data"], filename)
