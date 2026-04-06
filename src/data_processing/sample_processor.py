@@ -29,7 +29,7 @@ def init_client(user: str, password: str):
     )
 
     # Create processed data bucket if not available
-    if client.bucket_exists(c.MINIO_BUCKET_PROCESSED):
+    if not client.bucket_exists(c.MINIO_BUCKET_PROCESSED):
         client.make_bucket(bucket_name=c.MINIO_BUCKET_PROCESSED)
         print(
             f"Created MinIO bucket {c.MINIO_BUCKET_PROCESSED} for processed data.",
