@@ -166,7 +166,7 @@ class SampleProcessor(ConfigLoadable):
     def data_lake_has_unprocessed_files(self: Self) -> bool:
         # TODO: use meta data database for this logic
         data_lake_files = self.get_all_files_in_data_lake()
-        return not self.is_filename_processed(data_lake_files[-1])
+        return len(data_lake_files) > 0 and not self.is_filename_processed(data_lake_files[-1])
 
     # --------------------------------------------------------------------
     # Database communication
@@ -249,9 +249,13 @@ class SampleProcessor(ConfigLoadable):
         for stops_data in fetched_data:
 
             # Stops consist of previous and current/predicted stops
-            all_stops = list(
-                stops_data["old"] if stops_data["old"] is not None else []
-            ) + list(stops_data["actual"] if stops_data["actual"] is not None else [])
+            old_stops = (
+                stops_data.get("old") if stops_data.get("old") is not None else []
+            )
+            actual_stops = (
+                stops_data.get("actual") if stops_data.get("actual") is not None else []
+            )
+            all_stops = old_stops + actual_stops
 
             # No stops, no worry
             if len(all_stops) == 0:
