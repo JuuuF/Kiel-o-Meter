@@ -105,7 +105,11 @@ class SampleProcessor(ConfigLoadable):
         if wait_delay != 1:
             print("Found bucket!", flush=True)
 
-    def get_raw_file_from_data_lake(self: Self, filepath: str) -> dict:
+    def get_raw_file_from_data_lake(
+        self: Self,
+        filepath: str,
+        as_dict: bool = False,
+    ) -> dict:
         """
         Retrieve a raw file from the data lake using its file path.
         """
@@ -113,9 +117,12 @@ class SampleProcessor(ConfigLoadable):
         response = client.get_object(c.MINIO_BUCKET_RAW, filepath)
         # Convert back to json string
         json_data = decompress(response.read())
+
+        if not as_dict:
+            return json_data
+
         # Convert to dict
         data_dict = json.loads(json_data)
-
         return data_dict
 
     def get_all_file_names_in_data_lake(self: Self) -> list[str]:
@@ -313,7 +320,7 @@ class SampleProcessor(ConfigLoadable):
         log_id = f"[{int(hash(filename) % 1e6):06d}]"
         print(log_id, f"Processing file '{filename}'...", flush=True)
         # Get data
-        data = self.get_raw_file_from_data_lake(filename)
+        data = self.get_raw_file_from_data_lake(filename, as_dict=True)
 
         # Convert data
         all_halts = self.gather_halts_data(data["fetched_data"], filename)
