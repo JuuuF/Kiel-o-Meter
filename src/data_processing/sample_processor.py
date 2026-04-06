@@ -29,6 +29,14 @@ def init_client(user: str, password: str):
         secure=False,
     )
 
+    # Create processed data bucket if not available
+    if client.bucket_exists(c.MINIO_BUCKET_PROCESSED):
+        client.make_bucket(bucket_name=c.MINIO_BUCKET_PROCESSED)
+        print(
+            f"Created MinIO bucket {c.MINIO_BUCKET_PROCESSED} for processed data.",
+            flush=True,
+        )
+
 
 class ConfigLoadable:
     """
