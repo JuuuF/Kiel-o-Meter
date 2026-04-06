@@ -164,18 +164,19 @@ class SampleProcessor(ConfigLoadable):
         return all_files[upper]
 
     def data_lake_has_unprocessed_files(self: Self) -> bool:
+        # TODO: use meta data database for this logic
         data_lake_files = self.get_all_files_in_data_lake()
         return not self.is_filename_processed(data_lake_files[-1])
 
     # --------------------------------------------------------------------
     # Database communication
 
-    def store_halts_in_database(self: Self, halts: list[dict]) -> None:
+    def store_processed_halts(self: Self, halts: list[dict]) -> None:
         """
         Store the collected halts in the database.
         """
         # TODO: implement
-        print("WARNING: store_halts_in_database needs implementation!", flush=True)
+        print("WARNING: store_processed_halts needs implementation!", flush=True)
 
     # --------------------------------------------------------------------
     # File Processing
@@ -250,9 +251,7 @@ class SampleProcessor(ConfigLoadable):
             # Stops consist of previous and current/predicted stops
             all_stops = list(
                 stops_data["old"] if stops_data["old"] is not None else []
-            ) + list(
-                stops_data["actual"] if stops_data["actual"] is not None else []
-            )
+            ) + list(stops_data["actual"] if stops_data["actual"] is not None else [])
 
             # No stops, no worry
             if len(all_stops) == 0:
@@ -309,7 +308,7 @@ class SampleProcessor(ConfigLoadable):
         all_halts = self.gather_halts_data(data["fetched_data"].values(), filename)
 
         # Save data
-        self.store_halts_in_database(all_halts)
+        self.store_processed_halts(all_halts)
 
         # Mark file as processed
         self.mark_filename_as_processed(filename)
@@ -352,6 +351,7 @@ class SampleProcessor(ConfigLoadable):
         """
         Save to the default data processor config file path.
         """
+        # TODO: transfer this logic into a meta data database
         self.save_config(c.DATA_PROCESSOR_CONFIG_PATH)
 
     @classmethod
