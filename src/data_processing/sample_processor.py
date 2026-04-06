@@ -118,7 +118,7 @@ class SampleProcessor(ConfigLoadable):
         # Read compressed data
         response = client.get_object(c.MINIO_BUCKET_RAW, filepath)
         # Convert back to json string
-        json_data = decompress(response.read())
+        json_data = decompress(response.read()).decode()
 
         if not as_dict:
             return json_data
