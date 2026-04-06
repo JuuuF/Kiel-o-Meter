@@ -3,6 +3,7 @@ import constants as c
 
 # Python module imports
 import os
+import json
 import pickle
 import pandas as pd
 import pyarrow.parquet as pq
@@ -12,6 +13,7 @@ from typing import Self, Any, TypeVar, Type
 from hashlib import md5
 from minio import Minio
 from time import sleep
+from zlib import decompress
 
 T = TypeVar("T", bound="ConfigLoadable")
 
@@ -104,12 +106,10 @@ class SampleProcessor(ConfigLoadable):
         """
         # Read compressed data
         response = client.get_object(c.MINIO_BUCKET_RAW, filepath)
-        data_buffer = BytesIO(response.read())
-        # Convert to DataFrame
-        table = pq.read_table(data_buffer)
-        df: pd.DataFrame = table.to_pandas()
+        # Convert back to json string
+        json_data = decompress(response.read())
         # Convert to dict
-        data_dict = df.to_dict()
+        data_dict = json.loads(json_data)
 
         return data_dict
 
@@ -309,7 +309,7 @@ class SampleProcessor(ConfigLoadable):
         data = self.get_raw_file_from_data_lake(filename)
 
         # Convert data
-        all_halts = self.gather_halts_data(data["fetched_data"].values(), filename)
+        all_halts = self.gather_halts_data(data["fetched_data"], filename)
 
         # Save data
         self.store_processed_halts(all_halts)
