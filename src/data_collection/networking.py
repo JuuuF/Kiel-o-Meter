@@ -9,6 +9,7 @@ import json
 import requests
 from functools import cache
 from time import time
+from email.utils import parsedate_to_datetime
 
 
 # Build URL to request stops, based on ID
@@ -27,19 +28,23 @@ async def fetch_stop_async(session: aiohttp.ClientSession, url: str) -> dict:
                     break
                 single_stop_data = await response.text()
 
-            return dict(json.loads(single_stop_data))
-        except Exception as e:
-            stop_id = int(url.split("stop=")[1].split("&")[0])
-            n_tries += 1
-            log_level = "ERROR" if n_tries == c.FETCH_DELAY else "WARNING"
-            print(
-                f"[{log_level}] Connection failed for stop '{m.get_stop_by_id(stop_id)['name']}' (id={stop_id})"
+            # Convert response to dict
+            out_dict = dict(json.loads(single_stop_data))
+
+            # Add time information
+            fetch_time = response.headers.get("Date")
+            out_dict["fetchTime"] = (
+                str(parsedate_to_datetime(fetch_time)) if fetch_time else ""
             )
-            print(f"[{log_level}] {e}")
+
+            return out_dict
+        except Exception as e:
+            n_tries += 1
             if n_tries == c.FETCH_RETRIES:
-                print(f"[{log_level}] Aborting.")
-            else:
-                print(f"[{log_level}] Retrying... ({n_tries}/{c.FETCH_RETRIES})")
+                stop_id = int(url.split("stop=")[1].split("&")[0])
+                print(
+                    f"[ERROR] Fetching failed for stop '{m.get_stop_by_id(stop_id)['name']}' (id={stop_id}) after {n_tries} tries. Exception: {type(e)}, {e}"
+                )
     return {}
 
 
@@ -55,12 +60,12 @@ async def fetch_all_stops_async() -> list[dict]:
 
 
 # Fetch all known stops
-def fetch_all_stops() -> list[dict]:
+def fetch_all_stops() -> dict:
 
     # Collect stop data
-    print("Fetching data...", flush=True, end=" ")
+    print("Fetching data...", flush=True)
     start = time()
     all_stops = asyncio.run(fetch_all_stops_async())
-    print(f"Done in {time() - start:.2f}s", flush=True)
+    print(f"Fetched data in {time() - start:.2f}s", flush=True)
 
-    return all_stops
+    return dict(fetched_data=[s for s in all_stops if s])

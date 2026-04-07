@@ -40,6 +40,7 @@ services:
         container_name: data_collector
         env_file:
             - setup/data_collection/config.env
+            - setup/minio/config.env
         volumes:
             - ./src/data_collection:/opt/data_collection
         depends_on:
@@ -48,6 +49,22 @@ services:
         restart: always
         entrypoint: python
         command: /opt/data_collection/main.py
+    
+    data_processor:
+        build: ./setup/data_processing/
+        container_name: data_processor
+        env_file:
+            - setup/data_processing/config.env
+            - setup/minio/config.env
+        volumes:
+            - ./src/data_processing:/opt/data_processing
+        depends_on:
+            minio:
+                condition: service_healthy
+        restart: always
+        entrypoint: python
+        command: /opt/data_processing/main.py
+
 
     # --------------------------------------------------------------------
     # Data Lake
@@ -66,6 +83,8 @@ services:
         healthcheck:
             test:
                 ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+            start_period: 10s
+            start_interval: 2s
             interval: 30s
             timeout: 20s
             retries: 3

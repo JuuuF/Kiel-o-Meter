@@ -1,0 +1,4 @@
+minio==7.2.20
+pandas==3.0.1
+pyarrow==23.0.1
+polars==1.39.3

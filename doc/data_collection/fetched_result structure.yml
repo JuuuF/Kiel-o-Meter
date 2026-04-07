@@ -1,0 +1,100 @@
+fetched_result:
+  fetched_data: [...]
+
+fetched_data:
+  actual: [...]
+  directions: [] # Seems to be always empty
+  firstPassageTime: <unix time>
+    Unknown
+  generalAlerts: [...]
+  lastPassageTime: <unix time>
+    Unknown
+  old: [...]
+  routes: [...]
+  stopName: <str>
+    Name of bus stop
+  stopShortName: <int>
+    ID of bus stop
+  fetchTime: <iso time>
+    Time at which the result was fetched
+
+# Expected arrivals at this stop
+actual:
+  actualRelativeTime: <int>
+    Time in seconds until arrival
+  (actualTime): <str>
+    Time of arrival
+    -> Not present when status=PLANNED
+  direction: <str>
+    Can be stopName or district (What's shown as the bus's destination)
+  mixedTime: <str>
+    Arrival time, e.g. "12:00", "6 %UNIT_MIN%"
+  passageid: <long>
+    Unique identifier per arrival time forecast
+  patternText: <str>
+    Bus number, e.g. 91, x30, n14
+  plannedTime: <str>
+    Initially planned time of departure
+  routeId: <long>
+    Reference to route
+    Found in one of the route ids (../routes/id)
+  status: str
+    Current status of bus
+    ["PREDICTED", "PLANNED", "STOPPING"]
+  tripId: <long>
+    ID of current trip
+    I guess this changes each time a bus starts a new tour
+  (vehicleId): <long>
+    ID per bus
+    -> Not present when status=PLANNED
+
+# Alerts for the given stop
+generalAlerts:
+  title: <str>
+    Contents of the alert
+    (Usually contains typos and bad formatting, by the way)
+
+old: # very similar to "actual"
+  actualRelativeTime: <int>
+    Time in seconds since departure
+    Seems to be always negative
+  direction: <str>
+    See actual/direction
+  mixedTime: <str>
+    See actual/mixedTime
+  passageid: <long>
+    See actual/passageid
+  patternText: <str>
+    See actual/patternText
+  routeId: <long>
+    See actual/routeId
+  status: <str>
+    Current status of the bus
+    ["PLANNED", "DEPARTED"]
+    (PLANNED if mixedTime like "12:00"; DEPARTED if mixedTime like "3 %UNIT_MIN%")
+  tripId: <long>
+    See actual/tripId
+  (vehicleId): <long>
+    See actual/vehicleId
+    -> Not present when status=PLANNED
+
+# List of bus routes that are (or were) scheduled to stop there
+routes:
+  alerts: [...]
+  authority: <str>
+    Bus authority; seems to be always "KVG"
+  directions: <str, str>
+    [stopName, stopName]
+    Possible directions/end stops for the given route
+  id: <long>
+    ID for a certain route, e.g. X60's stop navigation.
+    Not sure how routes are handled that drive differently depending for example on the time of day
+  name: <str>
+    Like actual/patternText, but X and N are capitalized
+  routeType: <str>
+    Seems to be always "bus"
+  shortName: <str>
+    Like actual/patternText, but without "x" or "n"
+
+alerts: <empty>
+  Probably like generalAlerts
