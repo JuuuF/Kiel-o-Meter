@@ -45,3 +45,19 @@ def upload_data(
         Key=filename,
         Body=data,
     )
+
+
+def download_data(
+    client: Union[boto3.client, None],
+    bucket: str,
+    filename: str,
+) -> bytes:
+    """
+    Download data from MinIO.
+    """
+
+    if client is None:
+        client = get_minio_client()
+
+    data = client.get_object(Bucket=bucket, Key=filename)["Body"].read()
+    return data
