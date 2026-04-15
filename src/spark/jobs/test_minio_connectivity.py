@@ -7,6 +7,9 @@ from functools import cache
 from pyspark.sql import SparkSession
 from botocore.client import Config
 
+# ------------------------------------------------------------------------
+# Setup functions
+
 
 def create_spark_session() -> SparkSession:
     builder = SparkSession.builder.appName("MinIO Connectivity Test")
@@ -43,7 +46,11 @@ def get_minio_client() -> boto3.client:
     return client
 
 
-def test_minio_connection() -> bool:
+# ------------------------------------------------------------------------
+# Test functions
+
+
+def test_minio_connection() -> None:
     """
     Check if connection to MinIO can be established.
     """
@@ -55,14 +62,13 @@ def test_minio_connection() -> bool:
         response = client.list_buckets()
         buckets = [b["Name"] for b in response["Buckets"]]
         print("Available buckets:", buckets)
-        return True
 
     except Exception as e:
-        print(f"MinIO conenction failed: {str(e)}")
-        return False
+        print(f"Error: MinIO conenction failed: {str(e)}")
+        raise
 
 
-def test_minio_uploads():
+def test_minio_uploads() -> None:
     """
     Check if data can be uploaded to MinIO.
     """
@@ -109,11 +115,19 @@ def test_minio_uploads():
     client.delete_object(Bucket=bucket, Key=sample_file_name)
 
 
-spark = create_spark_session()
-if test_minio_connection():
-    print(f"MinIO connection can be established.")
-else:
-    print("MinIO connection cannot be established.")
+# ------------------------------------------------------------------------
+# Execution code
 
-test_minio_uploads()
-print("Data can be uploaded to MinIO.")
+
+def main() -> None:
+    spark = create_spark_session()
+
+    test_minio_connection()
+    print(f"MinIO connection can be established.")
+
+    test_minio_uploads()
+    print("Data can be uploaded to MinIO.")
+
+
+if __name__ == "__main__":
+    main()
