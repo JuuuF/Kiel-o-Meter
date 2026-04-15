@@ -215,8 +215,6 @@ services:
         build: ./setup/spark/base/
         image: kielometer/spark:4.0.2
         container_name: spark-client
-        environment:
-            - PATH=/opt/spark/bin:$PATH
         volumes:
             - ./src/spark:/opt/spark/work-dir
         command: sleep infinity
