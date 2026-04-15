@@ -1,5 +1,8 @@
+import boto3
 import logging
+from functools import cache
 from pyspark.sql import SparkSession
+from botocore.client import Config
 
 
 def create_spark_session() -> SparkSession:
@@ -24,25 +27,29 @@ def create_spark_session() -> SparkSession:
     return spark
 
 
+@cache
+def get_minio_client() -> boto3.client:
+    client = boto3.client(
+        "s3",
+        endpoint_url="http://minio:9000",
+        aws_access_key_id="minioadmin",
+        aws_secret_access_key="minioadmin",
+        config=Config(signature_version="s3v4"),
+        region_name="eu-central-1",
+    )
+    return client
+
+
 def test_minio_connection() -> bool:
     """
     Check if connection to MinIO can be established.
     """
-    import boto3
-    from botocore.client import Config
 
     try:
-        s3_client = boto3.client(
-            "s3",
-            endpoint_url="http://minio:9000",
-            aws_access_key_id="minioadmin",
-            aws_secret_access_key="minioadmin",
-            config=Config(signature_version="s3v4"),
-            region_name="eu-central-1",
-        )
+        client = get_minio_client()
 
         # List buckets to check connectivity
-        response = s3_client.list_buckets()
+        response = client.list_buckets()
         buckets = [b["Name"] for b in response["Buckets"]]
         print("Available buckets:", buckets)
         return True
