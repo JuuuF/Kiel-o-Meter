@@ -82,11 +82,6 @@ def test_minio_uploads() -> None:
         }
     )
 
-    # Prepare data
-    csv_buffer = io.StringIO()
-    sample_data.to_csv(csv_buffer, index=False)
-    csv_string = csv_buffer.getvalue()
-
     # Get filename
     sample_data_prefix = "sample_data_test_upload"
     sample_file_name = (
@@ -94,25 +89,59 @@ def test_minio_uploads() -> None:
     )
     bucket = client.list_buckets()["Buckets"][0]["Name"]
 
-    # Upload file
-    print("Uploading sample file...")
-    client.put_object(
-        Bucket=bucket,
-        Key=sample_file_name,
-        Body=csv_string.encode("utf-8"),
-    )
+    def get_bucket_files() -> list[str]:
+        return [o["Key"] for o in client.list_objects(Bucket=bucket)["Contents"]]
 
-    # List files
-    bucket_files = [o["Key"] for o in client.list_objects(Bucket=bucket)["Contents"]]
-    if sample_file_name in bucket_files:
-        print("File uploaded successfully.")
-    else:
-        print("Error: File not found in bucket.")
-        raise
+    def test_csv_upload() -> None:
+        # Prepare data
+        csv_buffer = io.StringIO()
+        sample_data.to_csv(csv_buffer, index=False)
+        csv_string = csv_buffer.getvalue()
+        csv_file = sample_file_name + ".csv"
+
+        # Upload file
+        print("Uploading CSV sample file...")
+        client.put_object(
+            Bucket=bucket,
+            Key=csv_file,
+            Body=csv_string.encode("utf-8"),
+        )
+
+        # Check upload
+        if csv_file in get_bucket_files():
+            print("File uploaded successfully.")
+        else:
+            print("Error while uploading file to bucket.")
+            raise
+
+        # Download and check data
+        downloaded_data = client.get_object(Bucket=bucket, Key=csv_file)["Body"]
+        csv_data = downloaded_data.read().decode("utf-8")
+        csv_buffer = io.StringIO(csv_data)
+        df = pd.read_csv(csv_buffer)
+
+        if (df == sample_data).all().all():
+            print("Sample data and downloaded data match.")
+        else:
+            print("Sample data does not match downloaded data.")
+            raise
+
+    def test_parquet_upload() -> None:
+        # TODO: Implement parquet upload
+        print("TODO: Implement parquet upload")
+        pass
+
+    test_csv_upload()
+    test_parquet_upload()
 
     # Delete sample file(s)
     print("Removing sample file...")
-    client.delete_object(Bucket=bucket, Key=sample_file_name)
+    for sample_file in [
+        file
+        for file in get_bucket_files()
+        if file.startswith(sample_data_prefix)
+    ]:
+        client.delete_object(Bucket=bucket, Key=sample_file)
 
 
 # ------------------------------------------------------------------------
