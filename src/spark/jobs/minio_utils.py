@@ -3,6 +3,7 @@ File for MinIO communication for spark jobs.
 """
 
 import boto3
+from typing import Union
 from functools import cache
 from botocore.client import Config
 
@@ -12,6 +13,9 @@ from botocore.client import Config
 
 @cache
 def get_minio_client() -> boto3.client:
+    """
+    Get a client for MinIO communication.
+    """
     client = boto3.client(
         "s3",
         endpoint_url="http://minio:9000",
@@ -21,3 +25,23 @@ def get_minio_client() -> boto3.client:
         region_name="eu-central-1",
     )
     return client
+
+
+def upload_data(
+    client: Union[boto3.client, None],
+    bucket: str,
+    filename: str,
+    data: bytes,
+) -> None:
+    """
+    Upload data to MinIO.
+    """
+
+    if client is None:
+        client = get_minio_client()
+
+    client.put_object(
+        Bucket=bucket,
+        Key=filename,
+        Body=data,
+    )
