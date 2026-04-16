@@ -39,6 +39,7 @@ def list_bucket_files(
     if client is None:
         client = get_minio_client()
 
+    # TODO: Check if bucket exists
     bucket_objects = client.list_objects(Bucket=bucket)["Contents"]
     return [o["Key"] for o in bucket_objects]
 
@@ -75,5 +76,6 @@ def download_data(
     if client is None:
         client = get_minio_client()
 
+    # TODO: Check if file is available
     data = client.get_object(Bucket=bucket, Key=filename)["Body"].read()
     return data
